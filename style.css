@@ -1,0 +1,58 @@
+const quoteText = document.getElementById('quote-text');
+const quoteAuthor = document.getElementById('quote-author');
+const newQuoteBtn = document.getElementById('new-quote-btn');
+
+const backgroundColors = [
+    'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #9b59b6 100%)',
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+    'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)',
+    'linear-gradient(135deg, #5f27cd 0%, #341f97 100%)',
+    'linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%)'
+];
+
+let currentColorIndex = 0;
+
+function changeBackground() {
+    currentColorIndex = (currentColorIndex + 1) % backgroundColors.length;
+    document.body.style.background = backgroundColors[currentColorIndex];
+}
+
+async function fetchQuote() {
+    newQuoteBtn.disabled = true;
+    newQuoteBtn.textContent = 'LOADING...';
+    quoteText.classList.add('loading');
+
+    changeBackground();
+
+    try {
+        const response = await fetch('https://api.quotable.io/random');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch quote');
+        }
+
+        const data = await response.json();
+        
+        quoteText.textContent = data.content;
+        quoteAuthor.textContent = data.author;
+        quoteAuthor.style.display = 'block';
+
+    } catch (error) {
+        console.error('Error fetching quote:', error);
+        quoteText.textContent = 'Oops! Could not fetch a quote. Please try again.';
+        quoteAuthor.style.display = 'none';
+    } finally {
+        newQuoteBtn.disabled = false;
+        newQuoteBtn.textContent = 'NEW QUOTE';
+        quoteText.classList.remove('loading');
+    }
+}
+
+newQuoteBtn.addEventListener('click', fetchQuote);
